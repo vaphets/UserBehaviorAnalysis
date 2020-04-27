@@ -9,15 +9,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 import redis.clients.jedis.Jedis
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.networkflow_analysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/23 11:34
-  */
+
 object UvWithBloom {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -25,8 +17,9 @@ object UvWithBloom {
     env.setParallelism(1)
 
     // 用相对路径定义数据源
-    val resource = getClass.getResource("/UserBehavior.csv")
-    val dataStream = env.readTextFile(resource.getPath)
+    //val resource = getClass.getResource("D:\\IdeaProjects\\UserBehaviorAnalysis\\NetworkFlowAnalysis\\src\\main\\resources\\UserBehavior.csv")
+   // val dataStream = env.readTextFile(resource.getPath)
+    val dataStream = env.readTextFile("D:\\IdeaProjects\\UserBehaviorAnalysis\\NetworkFlowAnalysis\\src\\main\\resources\\UserBehavior.csv")
       .map(data => {
         val dataArray = data.split(",")
         UserBehavior(dataArray(0).trim.toLong, dataArray(1).trim.toLong, dataArray(2).trim.toInt, dataArray(3).trim, dataArray(4).trim.toLong)
@@ -38,6 +31,8 @@ object UvWithBloom {
       .timeWindow(Time.hours(1))
       .trigger(new MyTrigger())
       .process(new UvCountWithBloom())
+
+
 
     dataStream.print()
 
@@ -76,20 +71,25 @@ class Bloom(size: Long) extends Serializable {
 
 class UvCountWithBloom() extends ProcessWindowFunction[(String, Long), UvCount, String, TimeWindow]{
   // 定义redis连接
-  lazy val jedis = new Jedis("localhost", 6379)
+  lazy val jedis = new Jedis("hadoop102", 6379)
   lazy val bloom = new Bloom(1<<29)
 
+
+  //我们每来一条元素的时候，调用这个process这个方法的时候，应该先把这个count值从redis中拿到。然后在判断当前新来的这个元素，到底要不要过滤调
+  //如果过滤调的话，count值不变，如果没有过滤调的话，count值+1.  而且要把这个窗口中的位图数组中的 位 0 变为 1.
   override def process(key: String, context: Context, elements: Iterable[(String, Long)], out: Collector[UvCount]): Unit = {
-    // 位图的存储方式，key是windowEnd，value是bitmap
+    // 位图的存储方式，key是windowEnd，value是bitmap  ，每个窗口都会创建一个位图的数组。
     val storeKey = context.window.getEnd.toString
     var count = 0L
+    // 每个窗口都应该有一个count值。因为我们上边触发器设置的是每来一条数据都触发窗口计算一次，并且情况状态。所以没法在这里边进行状态编程了，所以我们把这个count值也存入redis中。
     // 把每个窗口的uv count值也存入名为count的redis表，存放内容为（windowEnd -> uvCount），所以要先从redis中读取
     if( jedis.hget("count", storeKey) != null ){
       count = jedis.hget("count", storeKey).toLong
     }
-    // 用布隆过滤器判断当前用户是否已经存在
+    // 用布隆过滤器判断当前用户是否已经存在  ，当前这个elements中只有一个元素，因为我们上来一条触发这个函数执行一次。并且这个元素是（String，Long）  （dumpkey，user_id）
     val userId = elements.last._2.toString
-    val offset = bloom.hash(userId, 61)
+    //拿到这个user_id之后，然后我们计算hash，算出hash，然后就可以到位图里边对应的那个位置，去看看，到底是 0 还是1 。
+    val offset = bloom.hash(userId, 61)   //  这个offset就是算出的那个位置。
     // 定义一个标识位，判断reids位图中有没有这一位
     val isExist = jedis.getbit(storeKey, offset)
     if(!isExist){
@@ -102,4 +102,3 @@ class UvCountWithBloom() extends ProcessWindowFunction[(String, Long), UvCount, 
     }
   }
 }
-

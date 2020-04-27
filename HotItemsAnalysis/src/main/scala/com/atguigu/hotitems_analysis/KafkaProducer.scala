@@ -4,15 +4,7 @@ import java.util.Properties
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.hotitems_analysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/21 16:54
-  */
+
 object KafkaProducer {
   def main(args: Array[String]): Unit = {
     writeToKafka("hotitems")

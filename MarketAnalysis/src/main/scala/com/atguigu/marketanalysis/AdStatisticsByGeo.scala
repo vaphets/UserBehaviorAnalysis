@@ -12,15 +12,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.marketanalysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/24 10:10
-  */
+
 // 输入的广告点击事件样例类
 case class AdClickEvent( userId: Long, adId: Long, province: String, city: String, timestamp: Long )
 // 按照省份统计的输出结果样例类

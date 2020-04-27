@@ -7,15 +7,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.networkflow_analysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/23 10:43
-  */
+
 case class UvCount( windowEnd: Long, uvCount: Long )
 
 object UniqueVisitor {
@@ -33,7 +25,7 @@ object UniqueVisitor {
       } )
       .assignAscendingTimestamps(_.timestamp * 1000L)
       .filter( _.behavior == "pv" )    // 只统计pv操作
-      .timeWindowAll( Time.hours(1) )
+      .timeWindowAll( Time.hours(1))
       .apply( new UvCountByWindow() )
 
     dataStream.print()

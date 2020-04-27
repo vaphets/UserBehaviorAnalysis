@@ -10,15 +10,7 @@ import org.apache.flink.streaming.api.windowing.time.Time
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow
 import org.apache.flink.util.Collector
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.marketanalysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/23 15:37
-  */
+
 object AppMarketing {
   def main(args: Array[String]): Unit = {
     val env = StreamExecutionEnvironment.getExecutionEnvironment
@@ -29,9 +21,9 @@ object AppMarketing {
       .assignAscendingTimestamps(_.timestamp)
       .filter( _.behavior != "UNINSTALL" )
       .map( data => {
-        ( "dummyKey", 1L )
+        ( "dummyKey", 1L )   //  同一key  也就是相当于不分渠道。
       } )
-      .keyBy(_._1)     // 以渠道和行为类型作为key分组
+      .keyBy(_._1)     //
       .timeWindow( Time.hours(1), Time.seconds(10) )
       .aggregate( new CountAgg(), new MarketingCountTotal() )
 

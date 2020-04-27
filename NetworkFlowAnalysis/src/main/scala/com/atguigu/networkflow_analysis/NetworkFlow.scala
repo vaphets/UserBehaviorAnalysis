@@ -16,16 +16,6 @@ import org.apache.flink.util.Collector
 
 import scala.collection.mutable.ListBuffer
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.networkflow_analysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/23 9:21
-  */
-
 // 输入数据样例类
 case class ApacheLogEvent( ip: String, userId: String, eventTime: Long, method: String, url: String)
 

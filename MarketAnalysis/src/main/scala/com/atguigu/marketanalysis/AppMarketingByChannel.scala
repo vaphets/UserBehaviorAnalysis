@@ -14,15 +14,7 @@ import org.apache.flink.util.Collector
 
 import scala.util.Random
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.marketanalysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/23 15:06
-  */
+
 
 // 输入数据样例类
 case class MarketingUserBehavior( userId: String, behavior: String, channel: String, timestamp: Long )

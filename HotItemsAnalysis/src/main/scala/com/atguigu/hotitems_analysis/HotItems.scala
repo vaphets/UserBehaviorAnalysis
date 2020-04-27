@@ -19,16 +19,6 @@ import org.apache.flink.util.Collector
 
 import scala.collection.mutable.ListBuffer
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.hotitems_analysis
-  * Version: 1.0
-  *
-  * Created by wushengran on 2019/9/21 15:27
-  */
-
 // 定义输入数据的样例类
 case class UserBehavior( userId: Long, itemId: Long, categoryId: Int, behavior: String, timestamp: Long )
 // 定义窗口聚合结果样例类
@@ -108,13 +98,13 @@ class TopNHotItems(topSize: Int) extends KeyedProcessFunction[Long, ItemViewCoun
   private var itemState: ListState[ItemViewCount] = _
 
   override def open(parameters: Configuration): Unit = {
-    itemState = getRuntimeContext.getListState( new ListStateDescriptor[ItemViewCount]("item-state", classOf[ItemViewCount]) )
+    itemState = getRuntimeContext.getListState( new ListStateDescriptor[ItemViewCount]("item-state", classOf[ItemViewCount]))
   }
 
   override def processElement(value: ItemViewCount, ctx: KeyedProcessFunction[Long, ItemViewCount, String]#Context, out: Collector[String]): Unit = {
     // 把每条数据存入状态列表
     itemState.add(value)
-    // 注册一个定时器
+    // 注册一个定时器    相同windowEnd的定时时间，只会注册一次。
     ctx.timerService().registerEventTimeTimer( value.windowEnd + 1 )
   }
 

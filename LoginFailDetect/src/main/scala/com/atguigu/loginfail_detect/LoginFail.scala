@@ -10,15 +10,6 @@ import org.apache.flink.util.Collector
 
 import scala.collection.mutable.ListBuffer
 
-/**
-  * Copyright (c) 2018-2028 尚硅谷 All Rights Reserved 
-  *
-  * Project: UserBehaviorAnalysis
-  * Package: com.atguigu.loginfail_detect
-  * Version: 1.0/
-  *
-  * Created by wushengran on 2019/9/24 11:32
-  */
 
 // 输入的登录事件样例类
 case class LoginEvent( userId: Long, ip: String, eventType: String, eventTime: Long )
